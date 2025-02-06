@@ -1,0 +1,25 @@
+# Virtual environment
+venv/
+env/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Django secrets and environment variables
+.env
+*.env
+config/settings_local.py
+
+# Database
+db.sqlite3
+*.db
+
+# Logs and temporary files
+*.log
+*.pot
+*.pyc
+*.swp
+*.swo
+*.DS_Store

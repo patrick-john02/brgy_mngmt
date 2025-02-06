@@ -1,0 +1,143 @@
+{%load static%}
+<!DOCTYPE html>
+<html :class="{ 'theme-white': white }" x-data="data()" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'windmill/assets/css/tailwind.output.css'%}" />
+    <script
+      src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
+      defer
+    ></script>
+    <script src="{% static 'windmill/assets/js/init-alpine.js'%}"></script>
+  </head>
+  <body>
+    <div class="flex items-center min-h-screen p-6 bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-black">
+
+      <div class="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
+        <div class="flex flex-col overflow-y-auto md:flex-row">
+          <div class="h-32 md:h-auto md:w-1/2">
+            <img
+              aria-hidden="true"
+              class="object-cover w-full h-full dark:hidden"
+              src="{% static 'bg/login1.jpg'%}"
+              alt="Office"
+            />
+            <img
+              aria-hidden="true"
+              class="hidden object-cover w-full h-full dark:block"
+              src="{% static 'windmill/assets/img/login-side.jpg'%}"
+              alt="Office"
+            />
+          </div>
+          <div class="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
+            <div class="w-full">
+              <h1 class="mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Login</h1>
+
+              <form id="login-form">
+                <label for="username" class="block text-sm">
+                  <span class="text-gray-700 dark:text-gray-400">Username</span>
+                  <input
+                    class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
+                    placeholder="Username"
+                    id="username"
+                    name="username"
+                    required
+                  />
+                </label>
+
+                <label for="password" class="block mt-4 text-sm">
+                  <span class="text-gray-700 dark:text-gray-400">Password</span>
+                  <input
+                    class="block w-full mt-1 text-sm dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:text-gray-300 dark:focus:shadow-outline-gray form-input"
+                    placeholder="********"
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                  />
+                </label>
+
+                <button
+                  class="block w-full px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+                  type="submit"
+                >
+                  Log in
+                </button>
+              </form>
+
+              <div id="error-message" style="display: none; color: red;" class="mt-4">
+                Invalid credentials. Please try again.
+              </div>
+
+              <hr class="my-8" />
+
+              <p class="mt-4">
+                <a
+                  class="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
+                  href="./forgot-password.html"
+                >
+                  Forgot your password?
+                </a>
+              </p>
+              <p class="mt-1">
+                <a
+                  class="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
+                  href="#"
+                >
+                  Create account
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<script>
+  document.getElementById("login-form").addEventListener("submit", function(e) {
+    e.preventDefault(); // Prevent form submission
+
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    fetch("http://127.0.0.1:8000/api/token/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.access) {
+            // Save JWT token and user info
+            localStorage.setItem("token", data.access);
+            localStorage.setItem("first_name", data.first_name);
+            localStorage.setItem("last_name", data.last_name);
+            localStorage.setItem("user_type", data.user_type);
+
+            // Redirect based on user_type
+            if (data.user_type === 'admin') {
+                window.location.href = "/admin_dashboard/";
+            } else if (data.user_type === 'employee') {
+                window.location.href = "/employee_dashboard/";
+            } else if (data.user_type === 'resident') {
+                window.location.href = "/resident_dashboard/";
+            }
+        } else {
+            document.getElementById("error-message").style.display = "block";
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        document.getElementById("error-message").style.display = "block";
+    });
+});
+
+</script>
